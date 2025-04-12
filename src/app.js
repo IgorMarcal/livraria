@@ -1,6 +1,7 @@
 import express from "express";
 import conectaNaDatabase from "./config/dbConnect.js";
-import livroRoutes from './routes/livrosRoutes.js';
+import routes from "./routes/index.js";
+import manipuladorDeErros from "./middlewares/manipuladorDeErros.js";
 
 const conexao = await conectaNaDatabase();
 
@@ -13,25 +14,12 @@ conexao.once("open", () => {
 })
 
 const app = express();
-app.use(express.json());
-app.use(livroRoutes);
-
-app.get("/", (req, res) => {
-  res.status(200).send("Curso de Node.js");
+app.get("/livros", (req, res, next) => {
+  console.log("Middleware registrado no GET da rota /livros");
+  next();
 });
-
-
-
-// app.put("/livros/:id", (req, res) => {
-//   const index = buscaLivro(req.params.id);
-//   livros[index].titulo = req.body.titulo;
-//   res.status(200).json(livros);
-// });
-
-// app.delete("/livros/:id", (req, res) => {
-//   const index = buscaLivro(req.params.id);
-//   livros.splice(index, 1);
-//   res.status(200).send("livro removido com sucesso");
-// });
+routes(app);
+ 
+app.use(manipuladorDeErros);
 
 export default app;
